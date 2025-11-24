@@ -15,14 +15,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout outline-sdk fork
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          # gomobile@latest сейчас требует go >= 1.24
-          go-version: "1.24.10"
+          go-version-file: xray-core/go.mod
 
       - name: Set up Java (для Android-инструментов)
         uses: actions/setup-java@v4
@@ -30,7 +29,7 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Set up Android NDK (r26d, дружит с gomobile)
+      - name: Set up Android NDK (r29, 16KB-ready)
         id: ndk
         uses: nttld/setup-ndk@v1
         with:
@@ -44,7 +43,6 @@ jobs:
           go install golang.org/x/mobile/cmd/gomobile@latest
           go install golang.org/x/mobile/cmd/gobind@latest
           echo "$HOME/go/bin" >> "$GITHUB_PATH"
-          # у новой версии gomobile init больше нет флагов -ndk/-androidapi
           gomobile init
 
       - name: Build tun2socks AAR via gomobile bind
