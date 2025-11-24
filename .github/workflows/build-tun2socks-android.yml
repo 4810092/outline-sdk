@@ -37,7 +37,7 @@ jobs:
         run: |
           go install golang.org/x/mobile/cmd/gomobile@latest
           echo "$HOME/go/bin" >> "$GITHUB_PATH"
-          gomobile init
+          gomobile init -ndk $ANDROID_NDK_HOME -androidapi 21
 
       - name: Build tun2socks.aar via gomobile bind
         env:
