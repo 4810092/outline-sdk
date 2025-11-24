@@ -1,4 +1,4 @@
-name: Build tun2socks for Android
+name: Build tun2socks for Android and iOS
 
 on:
   # Ручной запуск из вкладки Actions
@@ -21,7 +21,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version-file: outline-sdk/go.mod
+          go-version-file: go.mod
 
       - name: Set up Java (для Android-инструментов)
         uses: actions/setup-java@v4
@@ -54,6 +54,8 @@ jobs:
           mkdir -p build
           gomobile bind -v \
             -target=android \
+            -androidapi=21 \
+            -ldflags="-extldflags=-Wl,-z,max-page-size=16384" \
             -o build/tun2socks.aar \
             ./mobile/tun2socks_android
 
@@ -68,4 +70,44 @@ jobs:
           name: tun2socks-android
           path: |
             build/tun2socks.aar
+          if-no-files-found: error
+
+  ios:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Install gomobile & gobind
+        run: |
+          go install golang.org/x/mobile/cmd/gomobile@latest
+          go install golang.org/x/mobile/cmd/gobind@latest
+          echo "$HOME/go/bin" >> "$GITHUB_PATH"
+          gomobile init
+
+      - name: Build tun2socks.framework via gomobile bind
+        run: |
+          mkdir -p build
+          gomobile bind -v \
+            -target=ios \
+            -o build/tun2socks.framework \
+            ./mobile/tun2socks_android
+
+      - name: List build outputs (debug)
+        run: |
+          echo "==== build dir ===="
+          ls -R build || true
+
+      - name: Upload iOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: tun2socks-ios
+          path: |
+            build/tun2socks.framework
           if-no-files-found: error
