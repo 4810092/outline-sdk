@@ -52,7 +52,6 @@ jobs:
       - name: Build tun2socks AAR via gomobile bind
         env:
           ANDROID_NDK_HOME: ${{ steps.ndk.outputs.ndk-path }}
-          # на будущее: выравнивание под 16KB страниц
           CGO_LDFLAGS: "-Wl,-z,max-page-size=16384"
         run: |
           mkdir -p build
