@@ -44,9 +44,17 @@ jobs:
         env:
           ANDROID_NDK_HOME: ${{ steps.ndk.outputs.ndk-path }}
         run: |
+          # Устанавливаем gomobile и gobind
           go install golang.org/x/mobile/cmd/gomobile@latest
           go install golang.org/x/mobile/cmd/gobind@latest
+
+          # Подтягиваем сам модуль x/mobile с подпакетами bind и bind/objc
+          go get golang.org/x/mobile/bind@latest
+          go get golang.org/x/mobile/bind/objc@latest
+
           echo "$HOME/go/bin" >> "$GITHUB_PATH"
+
+          # Инициализация gomobile с NDK r29 (ANDROID_NDK_HOME уже выставлен)
           gomobile init
 
       - name: Build tun2socks AAR via gomobile bind
@@ -89,9 +97,17 @@ jobs:
 
       - name: Install gomobile & gobind
         run: |
+          # Устанавливаем gomobile и gobind
           go install golang.org/x/mobile/cmd/gomobile@latest
           go install golang.org/x/mobile/cmd/gobind@latest
+
+          # Подтягиваем модуль x/mobile с bind и bind/objc
+          go get golang.org/x/mobile/bind@latest
+          go get golang.org/x/mobile/bind/objc@latest
+
           echo "$HOME/go/bin" >> "$GITHUB_PATH"
+
+          # Инициализируем gomobile (использует Xcode toolchain)
           gomobile init
 
       - name: Build tun2socks.framework via gomobile bind
